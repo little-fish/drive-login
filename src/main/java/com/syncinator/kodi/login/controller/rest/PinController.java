@@ -3,12 +3,11 @@ package com.syncinator.kodi.login.controller.rest;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.tomcat.util.codec.binary.Base64;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +64,7 @@ public class PinController {
 		if (storedPin != null && auth != null && storedPin.getOwner().equals(Utils.getRemoteAddress(request))) {
 			String[] data = auth.split(" ");
 			if (data.length == 2 && data[0].equalsIgnoreCase("basic")) {
-				String[] credentials = new String(Base64.decodeBase64(data[1].getBytes())).split(":");
+				String[] credentials = new String(Base64.getDecoder().decode(data[1].getBytes())).split(":");
 				if (credentials.length > 1 && storedPin.getPassword().equals(credentials[1])) {
 					if (storedPin.getAccessToken() == null) {
 						return new ResponseEntity<>(HttpStatus.ACCEPTED);
@@ -81,7 +80,7 @@ public class PinController {
 
 	@ExceptionHandler(NoSuchBeanDefinitionException.class)
 	public void exceptionHandler(HttpServletResponse response, NoSuchBeanDefinitionException e) throws IOException{
-		if (e.getBeanName().startsWith(Provider.NAME_PREFIX)) {
+		if (e.getBeanName() != null && e.getBeanName().startsWith(Provider.NAME_PREFIX)) {
 			response.sendError(HttpStatus.BAD_REQUEST.value(), "Invalid provider '"+e.getBeanName()+"'");
 			return;
 		}

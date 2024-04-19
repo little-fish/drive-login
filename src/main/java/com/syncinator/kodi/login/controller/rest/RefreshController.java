@@ -3,9 +3,8 @@ package com.syncinator.kodi.login.controller.rest;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -35,7 +34,7 @@ public class RefreshController {
 			@RequestParam(name="refresh_token", required = false) 
 		String refreshToken, HttpServletResponse response) throws Exception {
 		logger.info("Provider: " + provider);
-		if (StringUtils.isEmpty(provider) || StringUtils.isEmpty(refreshToken)) {
+		if (StringUtils.hasText(provider) || StringUtils.hasText(refreshToken)) {
 			logger.error(refreshToken);
 			response.sendError(HttpStatus.BAD_REQUEST.value(), "Provider and refresh token required");
 			return null;
@@ -49,7 +48,7 @@ public class RefreshController {
 	public void exceptionHandler(HttpServletRequest request, HttpServletResponse response, NoSuchBeanDefinitionException e) throws IOException{
 		logger.error("NoSuchBeanDefinitionException: " + e.getBeanName());
 		logger.error(request.getParameterMap().toString());
-		if (e.getBeanName().startsWith(Provider.NAME_PREFIX)) {
+		if (e.getBeanName() != null && e.getBeanName().startsWith(Provider.NAME_PREFIX)) {
 			response.sendError(HttpStatus.BAD_REQUEST.value(), "Invalid provider '"+e.getBeanName()+"'");
 			return;
 		}

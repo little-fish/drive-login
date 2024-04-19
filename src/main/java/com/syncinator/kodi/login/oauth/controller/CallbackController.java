@@ -1,14 +1,13 @@
 package com.syncinator.kodi.login.oauth.controller;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.syncinator.kodi.login.KodiLoginCacheManager;
+import com.syncinator.kodi.login.model.Pin;
+import com.syncinator.kodi.login.oauth.provider.Provider;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.ehcache.Cache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -18,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpStatusCodeException;
 
-import com.syncinator.kodi.login.KodiLoginCacheManager;
-import com.syncinator.kodi.login.controller.ReportController;
-import com.syncinator.kodi.login.model.Pin;
-import com.syncinator.kodi.login.oauth.provider.Provider;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/callback")
@@ -29,10 +28,7 @@ public class CallbackController {
 
 	@Autowired
 	private ApplicationContext context;
-	
-	@Autowired
-	private ReportController reportController;
-	
+
 	@RequestMapping
 	public String callback(
 			@RequestParam(required=false) String code,
@@ -68,7 +64,7 @@ public class CallbackController {
 	}
 	
 	@ExceptionHandler(HttpStatusCodeException.class)
-	public String httpClientErrorExceptionHandler(Model model, HttpServletResponse response, HttpStatusCodeException e) throws IOException{
+	public String httpClientErrorExceptionHandler(Model model, HttpServletRequest request, HttpServletResponse response, HttpStatusCodeException e) throws IOException{
 		model.addAttribute("errorText", e.getResponseBodyAsString());
 		return "auth-failure";
 	}
@@ -78,11 +74,6 @@ public class CallbackController {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(baos);
 		e.printStackTrace(ps);
-		try {
-			reportController.reportError(baos.toString(), request);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
 		model.addAttribute("errorText", e.getMessage());
 		return "auth-failure";
 	}

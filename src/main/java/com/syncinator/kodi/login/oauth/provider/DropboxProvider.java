@@ -2,9 +2,14 @@ package com.syncinator.kodi.login.oauth.provider;
 
 import java.util.Map;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component(Provider.NAME_PREFIX + DropboxProvider.NAME)
+@ConditionalOnProperty(
+		name = "provider",
+		havingValue = DropboxProvider.NAME
+)
 public class DropboxProvider extends Provider {
 	protected static final String NAME = "dropbox";
 

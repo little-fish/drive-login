@@ -1,24 +1,16 @@
-target/
-!.mvn/wrapper/maven-wrapper.jar
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-
-### IntelliJ IDEA ###
+# IntelliJ IDEA
 .idea
-*.iws
 *.iml
-*.ipr
+out
+captures
 
-### NetBeans ###
-nbproject/private/
-build/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
+# Gradle
+.gradle
+build
+
+# Common
+.tmp
+.log
+
+# webapp
+/resources/docker/*.jar

@@ -1,0 +1,39 @@
+plugins {
+    // https://github.com/gradle/foojay-toolchains
+    id('org.gradle.toolchains.foojay-resolver') version('0.8.0')
+}
+
+toolchainManagement {
+    jvm {
+        javaRepositories {
+            repository('foojay') {
+                resolverClass = org.gradle.toolchains.foojay.FoojayToolchainResolver
+            }
+        }
+    }
+}
+
+rootProject.name = 'drive-login'
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+
+    versionCatalogs {
+        libs {
+            version('spring-boot', '3.2.4')
+            version('graalvm-native', '0.10.1')
+
+            // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies
+            library('spring-boot-dependencies', 'org.springframework.boot', 'spring-boot-dependencies').versionRef('spring-boot')
+            library('spring-boot-starter-web', 'org.springframework.boot', 'spring-boot-starter-web').versionRef('spring-boot')
+            library('spring-boot-starter-thymeleaf', 'org.springframework.boot', 'spring-boot-starter-thymeleaf').versionRef('spring-boot')
+            library('spring-boot-starter-security', 'org.springframework.boot', 'spring-boot-starter-security').versionRef('spring-boot')
+            library('ehcache', 'org.ehcache', 'ehcache').versionRef('spring-boot')
+
+            plugin('org-springframework-boot', 'org.springframework.boot').versionRef('spring-boot')
+            plugin('org.graalvm.buildtools.native', 'org.graalvm.buildtools.native').versionRef('graalvm-native')
+        }
+    }
+}

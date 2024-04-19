@@ -3,9 +3,14 @@ package com.syncinator.kodi.login.oauth.provider;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component(Provider.NAME_PREFIX + GoogleDriveProvider.NAME)
+@ConditionalOnProperty(
+		name = "provider",
+		havingValue = GoogleDriveProvider.NAME
+)
 public class GoogleDriveProvider extends Provider {
 	protected static final String NAME = "googledrive";
 	

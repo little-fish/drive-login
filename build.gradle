@@ -1,0 +1,74 @@
+/*
+ * gcUnicorn
+ * Copyright (C) 2023  Martin Misiarz
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License version 2
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+import java.text.SimpleDateFormat
+
+plugins {
+    id 'java'
+    alias(libs.plugins.org.springframework.boot)
+    // https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html
+    // https://docs.spring.io/spring-boot/docs/current/reference/html/native-image.html
+    alias(libs.plugins.org.graalvm.buildtools.native)
+}
+
+bootJar {
+    manifest {
+        attributes(
+                'Created-On': new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+                'Implementation-Title': project.name
+        )
+    }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+        vendor = JvmVendorSpec.GRAAL_VM
+    }
+}
+
+graalvmNative {
+    toolchainDetection = true
+
+    binaries {
+        main {
+            imageName = "${project.name}-v${project.version}"
+        }
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+                'Created-On': new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Build-Jdk-Spec': project.java.toolchain.languageVersion
+        )
+    }
+}
+
+dependencies {
+    implementation(
+            platform(libs.spring.boot.dependencies),
+            libs.spring.boot.starter.web,
+            libs.spring.boot.starter.thymeleaf,
+            libs.spring.boot.starter.security,
+            libs.ehcache,
+    )
+}

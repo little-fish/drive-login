@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -38,7 +40,7 @@ public abstract class Provider {
 	public String getAuthorizeUrl(String name, String pin) {
 		return getAuthorizeUrl(name, pin, null);
 	}
-	
+	private static final Logger LOG = LoggerFactory.getLogger(Provider.class);
 	public String getAuthorizeUrl(String name, String pin, Map<String,String> extraParams) {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(getEnv(name, ENV_URL_AUTHORIZE))
 				.queryParam("client_id", getEnv(name, ENV_CLIENT_ID))

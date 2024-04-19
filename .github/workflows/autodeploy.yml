@@ -1,0 +1,61 @@
+name: auto-deploy
+
+on: [push]
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add some properties to the application.properties file.
+        run: |
+          echo >> src/main/resources/application.properties
+          echo "version=1.0.0" >> src/main/resources/application.properties
+          echo "provider=onedrive" >> src/main/resources/application.properties
+          echo "callback.url=https://drive-login.fly.dev/callback" >> src/main/resources/application.properties
+
+      - name: Install flyctl via https://github.com/superfly/flyctl-actions
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Log in to the registry
+        run: flyctl auth docker
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_TOKEN }}
+
+      - name: Install pack CLI via the official buildpack Action https://github.com/buildpacks/github-actions#setup-pack-cli-action
+        uses: buildpacks/github-actions/setup-pack@v5.5.4
+
+      # TODO: Create a buildpack to do all the preparation steps. See https://buildpacks.io/docs/buildpack-author-guide/.
+      # Caching Paketo Build see https://stackoverflow.com/a/66598693/4964553
+      # BP_OCI_SOURCE as --env creates the GitHub Container Registry <-> Repository link (https://paketo.io/docs/buildpacks/configuration/#applying-custom-labels)
+      # BP_JVM_VERSION 17, because we use Java 17 inside our Gradle build but Paketo defaults to 11
+      # Explicitly defining the java-native-image buildpack as described here https://paketo.io/docs/howto/java/#configure-the-graalvm-version to pin the GraalVM version (5.12.0 = GraalVM 21.3)
+      # Files specifies within BP_NATIVE_IMAGE_BUILD_ARGUMENTS have to be absolute path related to the workspace - they have to be prefixed with "/workspace/"
+      # https://github.com/paketo-buildpacks/java-native-image
+      - name: Build app with pack CLI & publish to GitHub Container Registry
+        run: |
+          pack build registry.fly.io/drive-login:latest \
+            --builder paketobuildpacks/builder:tiny \
+            --buildpack paketo-buildpacks/java-native-image@9.1.0 \
+            --path . \
+            --env "BP_JVM_VERSION=17" \
+            --env "BP_GRADLE_BUILD_ARGUMENTS=--no-daemon :bootJar" \
+            --env "BP_GRADLE_BUILT_ARTIFACT=build/libs/*.jar" \
+            --env "BP_NATIVE_IMAGE=true" \
+            --publish
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+      - push
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install flyctl via https://github.com/superfly/flyctl-actions
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy Drive Login native app to fly.io
+        run: flyctl deploy --remote-only --image registry.fly.io/drive-login:latest
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_TOKEN }}

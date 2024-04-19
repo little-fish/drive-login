@@ -1,11 +1,16 @@
 package com.syncinator.kodi.login.oauth.provider;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.stereotype.Component;
-
 @Component(Provider.NAME_PREFIX + AmazonDriveProvider.NAME)
+@ConditionalOnProperty(
+		name = "provider",
+		havingValue = AmazonDriveProvider.NAME
+)
 public class AmazonDriveProvider extends Provider {
 	protected static final String NAME = "amazondrive";
 	

@@ -242,3 +242,10 @@ table {
 td,th {
 	border: 1px solid gray;
 }
+
+.footer-left {
+	position: fixed;
+	left: 5px;
+	bottom: 5px;
+	text-align: left;
+}

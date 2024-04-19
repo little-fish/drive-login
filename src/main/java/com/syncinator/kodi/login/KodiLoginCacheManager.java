@@ -15,7 +15,7 @@ public class KodiLoginCacheManager {
 	
 	private static final String PIN_ALIAS = "pin";
 	
-	private static CacheManager pinCacheManager = CacheManagerBuilder.newCacheManagerBuilder()
+	private static final CacheManager PIN_CACHE_MANAGER = CacheManagerBuilder.newCacheManagerBuilder()
 			.withCache(PIN_ALIAS, 
 					CacheConfigurationBuilder
 						.newCacheConfigurationBuilder(String.class, Pin.class, ResourcePoolsBuilder.heap(100000))
@@ -23,10 +23,10 @@ public class KodiLoginCacheManager {
 			.build();
 	
 	static {
-		pinCacheManager.init();
+		PIN_CACHE_MANAGER.init();
 	}
 	
 	public static Cache<String, Pin> getPinCache(){
-		return pinCacheManager.getCache(PIN_ALIAS, String.class, Pin.class);
+		return PIN_CACHE_MANAGER.getCache(PIN_ALIAS, String.class, Pin.class);
 	}
 }
