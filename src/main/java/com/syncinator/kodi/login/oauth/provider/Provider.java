@@ -55,7 +55,7 @@ public abstract class Provider {
 		return builder.build().toUriString();
 		
 	}
-	
+
 	protected Map<String,Object> getTokens(String name, String grantType, String value) throws Exception {
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		params.add("client_id", getEnv(name, ENV_CLIENT_ID));

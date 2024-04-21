@@ -34,7 +34,7 @@ public class RefreshController {
 			@RequestParam(name="refresh_token", required = false) 
 		String refreshToken, HttpServletResponse response) throws Exception {
 		logger.info("Provider: " + provider);
-		if (StringUtils.hasText(provider) || StringUtils.hasText(refreshToken)) {
+		if (!StringUtils.hasText(provider) || !StringUtils.hasText(refreshToken)) {
 			logger.error(refreshToken);
 			response.sendError(HttpStatus.BAD_REQUEST.value(), "Provider and refresh token required");
 			return null;
